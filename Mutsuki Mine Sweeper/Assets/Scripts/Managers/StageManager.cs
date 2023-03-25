@@ -2,16 +2,21 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-static public class StageManager
+public class StageManager
 {
     static bool[,] tileMatrix;
     static int height, weight;
-    static int mineCount;
+    static int _mineCount;
 
-    static void Init()
+    GameObject _normalTile, _mineTile;
+
+    public void Init()
     {
-        height = 10;
+        _normalTile = (GameObject)Resources.Load("Prefabs/NormalTile");
+        _mineTile = (GameObject)Resources.Load("Prefabs/MineTile");
         weight = 10;
+        height = 10;
+        _mineCount = 10;
         tileMatrix = new bool[height, weight];
         for (int x = 0; x < weight; x++)
         {
@@ -20,10 +25,12 @@ static public class StageManager
                 tileMatrix[x, y] = false;
             }
         }
+
+        RandomizePattern();
     }
-    static void RandomizePattern()  // 파라미터로 클릭한 타일의 좌표 받아오고 주변 3x3 타일 제외하고 지뢰 생성 기능 추가 필요
+    void RandomizePattern()  // 파라미터로 클릭한 타일의 좌표 받아오고 주변 3x3 타일 제외하고 지뢰 생성 기능 추가 필요
     {
-        for (int i = 0; i < mineCount; i++)
+        for (int i = 0; i < _mineCount; i++)
         {
             int x = Random.Range(0, height - 1);
             int y = Random.Range(0, weight - 1);
@@ -33,6 +40,17 @@ static public class StageManager
                 continue;
             }
             tileMatrix[x, y] = true;
+        }
+
+        for (int x = 0; x < weight; x++)
+        {
+            for (int y = 0; y < height; y++)
+            {
+                if (tileMatrix[x, y])
+                    Managers.Instantiate(_mineTile, new Vector2(x, y), Quaternion.identity);
+                else
+                    Managers.Instantiate(_normalTile, new Vector2(x, y), Quaternion.identity);
+            }
         }
     }
 }
