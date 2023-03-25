@@ -8,14 +8,15 @@ public class StageManager
     static int height, weight;
     static int _mineCount;
 
-    GameObject _normalTile, _mineTile;
+    GameObject _normalTile, _mineTile, _tiles;
 
     public void Init()
     {
         _normalTile = (GameObject)Resources.Load("Prefabs/NormalTile");
         _mineTile = (GameObject)Resources.Load("Prefabs/MineTile");
-        weight = 10;
-        height = 10;
+        _tiles = GameObject.Find("Tiles");
+        weight = 9;
+        height = 9;
         _mineCount = 10;
         tileMatrix = new bool[height, weight];
         for (int x = 0; x < weight; x++)
@@ -46,11 +47,19 @@ public class StageManager
         {
             for (int y = 0; y < height; y++)
             {
+                GameObject obj;
                 if (tileMatrix[x, y])
-                    Managers.Instantiate(_mineTile, new Vector2(x, y), Quaternion.identity);
+                    Managers.Instantiate(_mineTile, new Vector2(x, y), Quaternion.identity).transform.parent = _tiles.transform;
                 else
-                    Managers.Instantiate(_normalTile, new Vector2(x, y), Quaternion.identity);
+                    Managers.Instantiate(_normalTile, new Vector2(x, y), Quaternion.identity).transform.parent = _tiles.transform;
             }
         }
+
+        Vector2 _cameraCenter = new Vector2(-weight / 2, -height / 2);
+        if (weight % 2 == 0)
+            _cameraCenter.x += 0.5f;
+        if (height % 2 == 0)
+            _cameraCenter.y += 0.5f;
+        _tiles.transform.Translate(_cameraCenter);
     }
 }
